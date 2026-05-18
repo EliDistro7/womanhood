@@ -1,420 +1,391 @@
 "use client";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import HeaderTop from "./HeaderTop";
 import Image from "next/image";
-import SearchInput from "./SearchInput";
 import Link from "next/link";
-import { FaBell, FaHeart, FaUser } from "react-icons/fa6";
-import { useLanguage } from "@/context/LanguageContext";
-import CartElement from "./CartElement";
-import HeartElement from "./HeartElement";
+import { FaBell } from "react-icons/fa6";
 import { signOut, useSession } from "next-auth/react";
 import toast from "react-hot-toast";
-import { useWishlistStore } from "@/app/_zustand/wishlistStore";
-import { FaHome, FaSearch, FaShoppingCart } from "react-icons/fa";
+import { Loader2, UserCircle2, User2, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Loader2, User, User2, UserCircle2 } from "lucide-react"; // Added Loader2 import
 
-const Header = () => {
-  const { data: session, status } = useSession();
-  const pathname = usePathname();
-  const { wishlist, setWishlist, wishQuantity } = useWishlistStore();
-  const { language, toggleLanguage } = useLanguage();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+const NAV_LINKS = [
+  { href: "/courses",    en: "Courses",    sw: "Kozi"        },
+  { href: "/programs",   en: "Programs",   sw: "Programu"    },
+  { href: "/mentorship", en: "Mentorship", sw: "Ushauri"     },
+  { href: "/about",      en: "About",      sw: "Kuhusu Sisi" },
+];
+
+// ─── Avatars ──────────────────────────────────────────────────────────────────
+const UserAvatar = ({ user }) =>
+  user?.image ? (
+    <Image
+      src={user.image} alt="User avatar" width={34} height={34}
+      className="rounded-full object-cover ring-1 ring-brand-gray-700"
+    />
+  ) : (
+    <span className="flex items-center justify-center w-[34px] h-[34px] rounded-full bg-brand-gray-800 ring-1 ring-brand-gray-700 text-brand-gray-400">
+      <UserCircle2 size={18} strokeWidth={1.5} />
+    </span>
+  );
+
+const AdminAvatar = ({ user }) =>
+  user?.image ? (
+    <Image
+      src={user.image} alt="Admin avatar" width={36} height={36}
+      className="rounded-full object-cover ring-1 ring-brand-gold-600"
+    />
+  ) : (
+    <span className="flex items-center justify-center w-9 h-9 rounded-full bg-brand-gray-900 ring-1 ring-brand-gold-600 text-brand-gold-500">
+      <User2 size={20} strokeWidth={1.5} />
+    </span>
+  );
+
+// ─── Navbar ───────────────────────────────────────────────────────────────────
+const Navbar = () => {
+  const { data: session } = useSession();
+  const pathname           = usePathname();
+  const [language,     setLanguage]     = useState("en");
+  const [isMenuOpen,   setIsMenuOpen]   = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isNavigating, setIsNavigating] = useState(false);
-  const [navigatingTo, setNavigatingTo] = useState("");
+  const [scrolled,     setScrolled]     = useState(false);
 
-  const handleLogout = () => {
-    setIsLoggingOut(true);
-    setTimeout(() => {
-      signOut();
-      toast.success("Logout successful!");
-      setIsLoggingOut(false);
-    }, 1000);
-  };
-
-  const handleNavigation = (path) => {
-    setIsNavigating(true);
-    setNavigatingTo(path);
-    // The actual navigation is handled by the Link component
-    // This is just to show the loading state
-  };
-
-  const getWishlistByUserId = async (id) => {
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_SERVER}/api/wishlist/${id}`, {
-        cache: "no-store",
-      });
-
-      if (!response.ok) throw new Error("Failed to fetch wishlist");
-      const wishlistData = await response.json();
-
-      if (wishlistData.message === "Wishlist not found") {
-        toast.error("User not found");
-        return;
-      }
-
-      const productArray = wishlistData.map((item) => ({
-        id: item?.product?.id,
-        title: item?.product?.title,
-        price: item?.product?.price,
-        image: item?.product?.mainImage,
-        slug: item?.product?.slug,
-        stockAvailabillity: item?.product?.inStock,
-      }));
-
-      if (wishlistData.length === 0) toast.error("Your wishlist is empty.");
-      setWishlist(productArray);
-    } catch (error) {
-      console.error("Error fetching wishlist:", error);
-      toast.error("Failed to load wishlist.");
-    }
-  };
-
-  const getUserByEmail = async () => {
-    if (session?.user?.email) {
-      try {
-        const response = await fetch(
-          `/api/users/email/${session?.user?.email}`,
-          { cache: "no-store" }
-        );
-
-        if (!response.ok) throw new Error("Failed to fetch user data");
-        const data = await response.json();
-        
-        data?.id ? getWishlistByUserId(data?.id) : toast.error("User not found");
-      } catch (error) {
-        console.error("Error fetching user by email:", error);
-        toast.error("Failed to load user data.");
-      }
-    }
-  };
+  const t = (en, sw) => language === "sw" ? sw : en;
 
   useEffect(() => {
-    if (session?.user?.email) getUserByEmail();
-  }, [session?.user?.email]);
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
-  // User avatar component with fallback to Lucide icons
-  const UserAvatar = ({ user }) => {
-    return user?.image ? (
-      <Image
-        src={user.image}
-        alt="User avatar"
-        width={40}
-        height={40}
-        className="rounded-full border-2 border-primary-100 object-cover"
-      />
-    ) : (
-      <div className="flex items-center justify-center w-10 h-10 rounded-full bg-primary-100 border-2 border-primary-200 text-primary-600">
-        <UserCircle2 size={24} strokeWidth={1.5} />
-      </div>
-    );
+  useEffect(() => { setIsMenuOpen(false); }, [pathname]);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    await new Promise(r => setTimeout(r, 900));
+    await signOut();
+    toast.success(t("Signed out.", "Umetoka kikamilifu."));
+    setIsLoggingOut(false);
   };
 
-  // Admin avatar component with fallback to Lucide icons
-  const AdminAvatar = ({ user }) => {
-    return user?.image ? (
-      <Image
-        src={user.image}
-        alt="Admin avatar"
-        width={44}
-        height={44}
-        className="rounded-full border-2 border-primary-100 object-cover"
-      />
-    ) : (
-      <div className="flex items-center justify-center w-11 h-11 rounded-full bg-primary-100 border-2 border-primary-200 text-primary-600">
-        <User2 size={28} strokeWidth={1.5} />
-      </div>
-    );
-  };
+  const isActive = (href) => pathname === href;
 
-  return (
-    <header className="bg-neutral-50 border-b border-neutral-200 shadow-sm">
-      {!pathname.startsWith("/admin") && (
-        <>
-          <div className="h-24 flex items-center justify-between px-4 md:px-8 xl:px-16 max-w-screen-2xl mx-auto">
-            {/* Branding */}
-            <Link 
-              href="/" 
-              className="flex items-center gap-2 md:gap-3 group transition-transform hover:scale-105 min-w-[120px]"
-              onClick={() => handleNavigation("/")}
-            >
-              <div className="flex flex-col">
-                <span className="font-display text-2xl md:text-3xl tracking-wide text-primary-600">
-                  KECHITA
+  // ── Admin navbar ─────────────────────────────────────────────────────────
+  if (pathname.startsWith("/admin")) {
+    return (
+      <header className="bg-brand-black border-b border-brand-gray-800">
+        <div className="h-16 flex items-center justify-between px-8 xl:px-16 max-w-screen-xl mx-auto">
+
+          {/* Brand */}
+          <Link href="/admin" className="flex items-center gap-4">
+            <div className="flex flex-col leading-none">
+              <div className="flex items-baseline gap-0 leading-none">
+                <span className="font-display text-3xl tracking-wide text-brand-green-400">
+                  WOMANHOOD
                 </span>
-                <span className="font-display text-lg md:text-xl tracking-wider text-neutral-700 -mt-1">
-                  FOODS
+                <span className="font-display text-3xl tracking-wide text-brand-gold-400 ml-2">
+                  SAFARI
                 </span>
               </div>
-              <div className="h-12 w-[2px] bg-primary-400 mx-2"></div>
-            </Link>
-
-            {/* Desktop Search Input */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-4 lg:mx-8">
-              <SearchInput />
+              <span className="font-mono text-[0.5rem] tracking-ultra uppercase text-brand-gray-500 mt-1">
+                ADMIN PANEL
+              </span>
             </div>
+            <span className="h-6 w-px bg-brand-gray-700 mx-1" />
+            <span className="font-sans text-xs tracking-widest uppercase text-brand-gray-500 font-medium">
+              Dashboard
+            </span>
+          </Link>
 
-            {/* Right Section */}
-            <div className="flex items-center gap-4 md:gap-6">
-              {/* Language Toggle */}
-              <button
-                onClick={toggleLanguage}
-                className={`flex items-center justify-center rounded-full transition-all 
-                  ${language === 'sw' ? 'bg-primary-500 text-white' : 'bg-primary-100 text-primary-600'}
-                  w-10 h-10 md:w-12 md:h-12 hover:bg-primary-600 hover:text-white 
-                  active:scale-95 shadow-sm hover:shadow-md`}
-                  aria-label="Toggle language"
-              >
-                <span className="font-semibold text-sm md:text-base">
-                  {language === 'sw' ? 'SW' : 'EN'}
-                </span>
-              </button>
+          {/* Right */}
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setLanguage(l => l === "en" ? "sw" : "en")}
+              className="h-7 px-3 rounded-sm border border-brand-gray-700 font-mono text-2xs tracking-ultra uppercase
+                         text-brand-gray-400 hover:border-brand-gold-500 hover:text-brand-gold-400
+                         transition-all duration-150 active:scale-95"
+            >
+              {language}
+            </button>
 
-              {/* Desktop Icons */}
-              <div className="hidden md:flex gap-4 md:gap-6">
-                <HeartElement 
-                  wishQuantity={wishQuantity} 
-                  className="text-primary-600 hover:text-primary-700 transition-colors"
-                />
-                <CartElement 
-                  className="text-primary-600 hover:text-primary-700 transition-colors"
-                />
-                
-                {/* User Profile */}
-                {session?.user ? (
-                  <div className="relative group">
-                    <button className="flex items-center gap-2 text-primary-600 hover:text-primary-700">
-                      <UserAvatar user={session.user} />
-                    </button>
-                    <div className="absolute right-0 hidden group-hover:block bg-white shadow-layer rounded-lg p-4 w-48">
+            {session?.user && (
+              <div className="flex items-center gap-3">
+                <button className="p-1.5 rounded text-brand-gray-500 hover:text-brand-gold-400 hover:bg-brand-gray-900 transition-colors">
+                  <FaBell size={15} />
+                </button>
+                <div className="relative group">
+                  <button className="block focus:outline-none" aria-label="Account menu">
+                    <AdminAvatar user={session.user} />
+                  </button>
+                  <div className="absolute right-0 top-full mt-2 w-52 bg-brand-gray-900 rounded border border-brand-gray-800
+                                  opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto
+                                  translate-y-1 group-hover:translate-y-0 transition-all duration-200 z-50 shadow-elevated">
+                    <div className="px-4 py-3 border-b border-brand-gray-800">
+                      <p className="text-sm font-sans font-semibold text-white tracking-wide truncate">{session.user.name}</p>
+                      <p className="text-xs font-mono text-brand-gray-500 truncate mt-0.5">{session.user.email}</p>
+                    </div>
+                    <div className="p-1">
                       <button
                         onClick={handleLogout}
-                        className="w-full text-left text-neutral-700 hover:text-primary-600 transition-colors flex items-center gap-2"
+                        disabled={isLoggingOut}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded text-xs font-sans tracking-wider uppercase
+                                   text-brand-gray-400 hover:bg-brand-gray-800 hover:text-brand-gold-400 transition-colors"
                       >
-                        {isLoggingOut ? (
-                          <>
-                            <Loader2 size={16} className="animate-spin" />
-                            <span>{language === 'sw' ? 'Inatoka...' : 'Logging out...'}</span>
-                          </>
-                        ) : (
-                          <>
-                            <span>{language === 'sw' ? 'Toka' : 'Log Out'}</span>
-                          </>
-                        )}
+                        {isLoggingOut
+                          ? <><Loader2 size={12} className="animate-spin" />{t("Signing out…", "Inatoka…")}</>
+                          : t("Sign Out", "Toka")}
                       </button>
                     </div>
                   </div>
-                ) : (
-                  <Link
-                    href="/login"
-                    className="text-primary-600 hover:text-primary-700 transition-colors flex items-center gap-2"
-                    onClick={() => handleNavigation("/login")}
-                  >
-                    {isNavigating && navigatingTo === "/login" ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        <span>{language === 'sw' ? 'Inapakia...' : 'Loading...'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <User size={20} />
-                        <span>{language === 'sw' ? 'Ingia' : 'Sign In'}</span>
-                      </>
-                    )}
-                  </Link>
-                )}
-              </div>
-
-              {/* Mobile Menu Button */}
-              <button 
-                onClick={() => setIsMenuOpen((prev) => !prev)}
-                className="md:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors"
-                aria-label="Open menu"
-              >
-                <svg className="w-6 h-6 text-neutral-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          {/* Mobile Dropdown Menu with Small Icons */}
-          <AnimatePresence>
-            {isMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.3 }}
-                className="md:hidden bg-white border-t border-neutral-200 p-2 mb-8"
-              >
-                <nav className="flex justify-around">
-                  <Link 
-                    href="/" 
-                    className="flex flex-col items-center text-neutral-700 hover:text-primary-600"
-                    onClick={() => handleNavigation("/")}
-                  >
-                    {isNavigating && navigatingTo === "/" ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        <span className="text-xs mt-1">{language === 'sw' ? 'Inapakia' : 'Loading'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaHome size={20} />
-                        <span className="text-xs mt-1">{language === 'sw' ? 'Nyumbani' : 'Home'}</span>
-                      </>
-                    )}
-                  </Link>
-                  <button className="flex flex-col items-center text-neutral-700 hover:text-primary-600">
-                    <FaSearch size={20} />
-                    <span className="text-xs mt-1">{language === 'sw' ? 'Tafuta' : 'Search'}</span>
-                  </button>
-                  <Link 
-                    href="/wishlist" 
-                    className="flex flex-col items-center text-neutral-700 hover:text-primary-600"
-                    onClick={() => handleNavigation("/wishlist")}
-                  >
-                    {isNavigating && navigatingTo === "/wishlist" ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        <span className="text-xs mt-1">{language === 'sw' ? 'Inapakia' : 'Loading'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaHeart size={20} />
-                        <span className="text-xs mt-1">{language === 'sw' ? 'Pendeleo' : 'Favs'}</span>
-                      </>
-                    )}
-                  </Link>
-                  <Link 
-                    href="/cart" 
-                    className="flex flex-col items-center text-neutral-700 hover:text-primary-600"
-                    onClick={() => handleNavigation("/cart")}
-                  >
-                    {isNavigating && navigatingTo === "/cart" ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        <span className="text-xs mt-1">{language === 'sw' ? 'Inapakia' : 'Loading'}</span>
-                      </>
-                    ) : (
-                      <>
-                        <FaShoppingCart size={20} />
-                        <span className="text-xs mt-1">{language === 'sw' ? 'Kikapu' : 'Cart'}</span>
-                      </>
-                    )}
-                  </Link>
-                  {session?.user ? (
-                    <Link 
-                      href="/profile" 
-                      className="flex flex-col items-center text-neutral-700 hover:text-primary-600"
-                      onClick={() => handleNavigation("/profile")}
-                    >
-                      {isNavigating && navigatingTo === "/profile" ? (
-                        <>
-                          <Loader2 size={20} className="animate-spin" />
-                          <span className="text-xs mt-1">{language === 'sw' ? 'Inapakia' : 'Loading'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <User size={20} />
-                          <span className="text-xs mt-1">{language === 'sw' ? 'Wasifu' : 'Profile'}</span>
-                        </>
-                      )}
-                    </Link>
-                  ) : (
-                    <Link 
-                      href="/login" 
-                      className="flex flex-col items-center text-neutral-700 hover:text-primary-600"
-                      onClick={() => handleNavigation("/login")}
-                    >
-                      {isNavigating && navigatingTo === "/login" ? (
-                        <>
-                          <Loader2 size={20} className="animate-spin" />
-                          <span className="text-xs mt-1">{language === 'sw' ? 'Inapakia' : 'Loading'}</span>
-                        </>
-                      ) : (
-                        <>
-                          <User size={20} />
-                          <span className="text-xs mt-1">{language === 'sw' ? 'Ingia' : 'Sign In'}</span>
-                        </>
-                      )}
-                    </Link>
-                  )}
-                </nav>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          
-          {/* Mobile Search Input */}
-          <div className="md:hidden px-4 pb-4 -mt-2">
-            <SearchInput />
-          </div>
-        </>
-      )}
-
-      {/* Admin Panel Header */}
-      {pathname.startsWith("/admin") && (
-        <div className="h-24 flex justify-between items-center px-8 xl:px-16 max-w-screen-2xl mx-auto">
-          <Link 
-            href="/admin" 
-            className="flex items-center gap-3 group"
-            onClick={() => handleNavigation("/admin")}
-          >
-            {isNavigating && navigatingTo === "/admin" ? (
-              <div className="flex items-center gap-2">
-                <Loader2 size={24} className="animate-spin text-primary-600" />
-                <span className="font-display text-2xl text-primary-600">
-                  {language === 'sw' ? 'Inapakia...' : 'Loading...'}
-                </span>
-              </div>
-            ) : (
-              <>
-                <div className="flex flex-col">
-                  <span className="font-display text-2xl text-primary-600">
-                    KECHITA
-                  </span>
-                  <span className="font-display text-lg text-neutral-700 -mt-1">
-                    ADMIN
-                  </span>
                 </div>
-                <span className="text-primary-600 font-display text-xl border-l-2 border-neutral-200 pl-3">
-                  Dashboard
-                </span>
-              </>
-            )}
-          </Link>
-          
-          <div className="flex items-center gap-6">
-            <button
-              onClick={toggleLanguage}
-              className={`flex items-center justify-center rounded-full transition-all 
-                ${language === 'sw' ? 'bg-primary-500 text-white' : 'bg-primary-100 text-primary-600'}
-                w-12 h-12 hover:bg-primary-600 hover:text-white 
-                active:scale-95 shadow-sm hover:shadow-md`}
-              aria-label="Toggle language"
-            >
-              <span className="font-semibold text-base">
-                {language === 'sw' ? 'SW' : 'EN'}
-              </span>
-            </button>
-            
-            {session?.user && (
-              <div className="flex items-center gap-4">
-                <button className="p-2 hover:bg-neutral-100 rounded-full">
-                  <FaBell className="text-neutral-600 w-6 h-6" />
-                </button>
-                <AdminAvatar user={session.user} />
               </div>
             )}
           </div>
         </div>
-      )}
+      </header>
+    );
+  }
+
+  // ── Public navbar ─────────────────────────────────────────────────────────
+  return (
+    <header
+      className={`
+        fixed inset-x-0 top-0 z-50
+        bg-brand-gray-900
+        transition-all duration-300
+        ${scrolled ? "shadow-[0_4px_24px_rgba(0,0,0,0.35)]" : ""}
+      `}
+    >
+      {/* Gold hairline — mirrors the eyebrow line in WHero */}
+      <div className="h-[2px] w-full bg-brand-gold-500" />
+
+      {/* Subtle grid texture — same as hero left panel */}
+      <div
+        className="absolute inset-0 opacity-[0.025] pointer-events-none"
+        style={{
+          backgroundImage:
+            "repeating-linear-gradient(0deg,#fff 0px,#fff 1px,transparent 1px,transparent 40px)," +
+            "repeating-linear-gradient(90deg,#fff 0px,#fff 1px,transparent 1px,transparent 40px)",
+        }}
+      />
+
+      <div className="relative h-[4.25rem] flex items-center justify-between px-6 md:px-12 xl:px-20 max-w-screen-xl mx-auto">
+
+        {/* Brand */}
+        <Link href="/" className="flex flex-col leading-none group shrink-0">
+          <div className="flex items-baseline">
+            <span className="font-display tracking-wide text-brand-green-400 text-3xl md:text-4xl transition-colors duration-200 group-hover:text-brand-green-300">
+              WOMANHOOD
+            </span>
+            <span className="font-display tracking-wide text-brand-gold-500 text-3xl md:text-4xl ml-2 transition-colors duration-200 group-hover:text-brand-gold-400">
+              SAFARI
+            </span>
+          </div>
+          <span className="font-mono text-[0.48rem] tracking-ultra uppercase text-brand-gray-500 mt-0.5 pl-0.5">
+            Inspiring young women with Wisdom
+          </span>
+        </Link>
+
+        {/* Desktop nav */}
+        <nav className="hidden md:flex items-center">
+          {NAV_LINKS.map(({ href, en, sw }) => (
+            <Link
+              key={href}
+              href={href}
+              className={`
+                relative px-5 py-2 font-mono text-xs tracking-[0.18em] uppercase font-semibold
+                transition-colors duration-150
+                ${isActive(href)
+                  ? "text-brand-white"
+                  : "text-brand-gray-500 hover:text-brand-gray-200"}
+              `}
+            >
+              {t(en, sw)}
+              {isActive(href) && (
+                <motion.span
+                  layoutId="active-underline"
+                  className="absolute inset-x-4 -bottom-px h-[2px] bg-brand-gold-500"
+                  transition={{ type: "spring", stiffness: 400, damping: 32 }}
+                />
+              )}
+            </Link>
+          ))}
+        </nav>
+
+        {/* Right controls */}
+        <div className="flex items-center gap-3">
+          {/* Language pill — mirrors hero's gold accent style */}
+          <button
+            onClick={() => setLanguage(l => l === "en" ? "sw" : "en")}
+            className="h-7 px-3 border border-brand-gray-700 rounded-sm font-mono text-2xs tracking-ultra uppercase
+                       text-brand-gray-400 hover:border-brand-gold-500 hover:text-brand-gold-400
+                       transition-all duration-150 active:scale-95"
+            aria-label="Toggle language"
+          >
+            {language}
+          </button>
+
+          {/* Session controls (desktop) */}
+          {session?.user ? (
+            <div className="hidden md:flex items-center gap-3">
+              <button className="p-1.5 rounded text-brand-gray-500 hover:text-brand-gold-400 hover:bg-brand-gray-800 transition-colors">
+                <FaBell size={14} />
+              </button>
+              <div className="relative group">
+                <button className="block focus:outline-none" aria-label="Account menu">
+                  <UserAvatar user={session.user} />
+                </button>
+                <div className="absolute right-0 top-full mt-2 w-52 bg-brand-gray-900 rounded-sm border border-brand-gray-800
+                                opacity-0 pointer-events-none group-hover:opacity-100 group-hover:pointer-events-auto
+                                translate-y-1 group-hover:translate-y-0 transition-all duration-200 z-50 shadow-elevated">
+                  <div className="px-4 py-3 border-b border-brand-gray-800">
+                    <p className="text-sm font-sans font-semibold text-brand-white tracking-wide truncate">{session.user.name}</p>
+                    <p className="text-xs font-mono text-brand-gray-500 truncate mt-0.5">{session.user.email}</p>
+                  </div>
+                  <div className="p-1">
+                    <button
+                      onClick={handleLogout}
+                      disabled={isLoggingOut}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-sm text-xs font-mono tracking-wider uppercase
+                                 text-brand-gray-400 hover:bg-brand-gray-800 hover:text-brand-gold-400 transition-colors"
+                    >
+                      {isLoggingOut
+                        ? <><Loader2 size={12} className="animate-spin" />{t("Signing out…", "Inatoka…")}</>
+                        : t("Sign Out", "Toka")}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="hidden md:flex items-center gap-2">
+              <Link
+                href="/login"
+                className="font-mono text-xs tracking-[0.15em] uppercase text-brand-gray-400 hover:text-brand-white
+                           px-4 py-2 transition-colors duration-150"
+              >
+                {t("Sign in", "Ingia")}
+              </Link>
+              <Link
+                href="/register"
+                className="inline-flex items-center gap-1.5 bg-brand-green-500 hover:bg-brand-green-600
+                           text-brand-white font-mono text-xs tracking-[0.15em] uppercase
+                           px-4 py-2 rounded-sm transition-colors duration-200"
+              >
+                {t("Get started", "Anza")}
+              </Link>
+            </div>
+          )}
+
+          {/* Mobile menu toggle */}
+          <button
+            onClick={() => setIsMenuOpen(v => !v)}
+            className="md:hidden p-1.5 rounded-sm text-brand-gray-400 hover:text-brand-white hover:bg-brand-gray-800 transition-colors"
+            aria-label={isMenuOpen ? "Close menu" : "Open menu"}
+          >
+            {isMenuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </div>
+
+      {/* Mobile menu — dark panel matching hero left column */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.nav
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.22, ease: "easeInOut" }}
+            className="md:hidden overflow-hidden bg-brand-gray-900 border-t border-brand-gray-800 relative"
+          >
+            {/* Same subtle grid texture */}
+            <div
+              className="absolute inset-0 opacity-[0.025] pointer-events-none"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(0deg,#fff 0px,#fff 1px,transparent 1px,transparent 40px)," +
+                  "repeating-linear-gradient(90deg,#fff 0px,#fff 1px,transparent 1px,transparent 40px)",
+              }}
+            />
+
+            <div className="relative px-6 py-6 flex flex-col">
+              {[{ href: "/", en: "Home", sw: "Nyumbani" }, ...NAV_LINKS].map(({ href, en, sw }, i) => (
+                <motion.div
+                  key={href}
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.045, duration: 0.2 }}
+                >
+                  <Link
+                    href={href}
+                    onClick={() => setIsMenuOpen(false)}
+                    className={`
+                      flex items-center justify-between py-4 border-b border-brand-gray-800 last:border-0
+                      font-display text-2xl tracking-widest uppercase transition-colors duration-150
+                      ${isActive(href)
+                        ? "text-brand-white"
+                        : "text-brand-gray-500 hover:text-brand-white"}
+                    `}
+                  >
+                    <span>{t(en, sw)}</span>
+                    {/* Gold dot on active — mirrors hero's gold accent */}
+                    {isActive(href)
+                      ? <span className="w-2 h-2 rounded-full bg-brand-gold-500" />
+                      : <span className="h-[1px] w-4 bg-brand-gray-700" />
+                    }
+                  </Link>
+                </motion.div>
+              ))}
+
+              {/* Mobile CTA */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.28, duration: 0.2 }}
+                className="pt-5 flex flex-col gap-2"
+              >
+                {session?.user ? (
+                  <button
+                    onClick={handleLogout}
+                    disabled={isLoggingOut}
+                    className="flex items-center justify-center gap-2 border border-brand-gray-700 hover:border-brand-gray-500
+                               text-brand-gray-400 hover:text-brand-white font-mono text-xs tracking-[0.15em] uppercase
+                               py-3 rounded-sm transition-colors duration-150"
+                  >
+                    {isLoggingOut
+                      ? <><Loader2 size={12} className="animate-spin" />{t("Signing out…", "Inatoka…")}</>
+                      : t("Sign Out", "Toka")}
+                  </button>
+                ) : (
+                  <>
+                    <Link
+                      href="/register"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center justify-center bg-brand-green-500 hover:bg-brand-green-600
+                                 text-brand-white font-mono text-xs tracking-[0.15em] uppercase
+                                 py-3 rounded-sm transition-colors duration-200"
+                    >
+                      {t("Get started", "Anza")}
+                    </Link>
+                    <Link
+                      href="/login"
+                      onClick={() => setIsMenuOpen(false)}
+                      className="flex items-center justify-center border border-brand-gray-700 hover:border-brand-gray-500
+                                 text-brand-gray-400 hover:text-brand-white font-mono text-xs tracking-[0.15em] uppercase
+                                 py-3 rounded-sm transition-colors duration-150"
+                    >
+                      {t("Sign in", "Ingia")}
+                    </Link>
+                  </>
+                )}
+              </motion.div>
+            </div>
+          </motion.nav>
+        )}
+      </AnimatePresence>
     </header>
   );
 };
 
-export default Header;
+
+export default Navbar;

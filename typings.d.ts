@@ -6,6 +6,11 @@ interface Product {
   rating: number;
   description: string;
   mainImage: string;
+  isNew: boolean;
+  isBestSeller: boolean;
+  oldPrice: number;
+  featured: boolean;
+  isPopular: boolean;
   manufacturer: string;
   categoryId: string;
   category: {name: string}?;

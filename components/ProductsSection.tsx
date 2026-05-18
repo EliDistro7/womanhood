@@ -1,81 +1,105 @@
-// ProductsSection.tsx
+// CoursesSection.tsx
 'use client';
 
 import React from "react";
-import ProductItem from "./ProductItem";
-import Heading from "./Heading";
 import { motion } from "framer-motion";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination, Autoplay } from "swiper/modules";
+import { Pagination, Autoplay, EffectCoverflow } from "swiper/modules";
 import { useLanguage } from "@/context/LanguageContext";
+import { ArrowRight, Award, Sparkles, TrendingUp } from "lucide-react";
+import ProductItem from "./ProductItem";
+import Link from "next/link";
 
 // Import Swiper styles
 import "swiper/css";
 import "swiper/css/pagination";
+import "swiper/css/effect-coverflow";
 
-const ProductsSection = () => {
-  const [products, setProducts] = React.useState<Product[]>([]);
+const CoursesSection = () => {
+  const [featuredCourses, setFeaturedCourses] = React.useState<Product[]>([]);
   const [loading, setLoading] = React.useState(true);
   const { language } = useLanguage();
 
   React.useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchCourses = async () => {
       try {
         const response = await fetch(`${process.env.NEXT_PUBLIC_CLIENT}/api/products`);
         const data = await response.json();
-        setProducts(data);
+        
+        // Get only the first 3 products or the ones marked as featured
+        const featured = data.filter((course: Product) => course?.featured).slice(0, 3);
+        
+        // If there are fewer than 3 featured courses, add non-featured ones until we have 3
+        if (featured.length < 3) {
+          const nonFeatured = data.filter((course: Product) => !course.featured).slice(0, 3 - featured.length);
+          setFeaturedCourses([...featured, ...nonFeatured]);
+        } else {
+          setFeaturedCourses(featured);
+        }
       } catch (error) {
-        console.error("Failed to fetch products:", error);
+        console.error("Failed to fetch courses:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchProducts();
+    fetchCourses();
   }, []);
 
   const translations = {
-    noProducts: {
-      en: "No products found or failed to load.",
-      sw: "Hakuna bidhaa zilizopatikana au kushindwa kupakua."
-    },
     loading: {
-      en: "Loading premium products...",
-      sw: "Inapakia bidhaa bora..."
+      en: "Loading courses...",
+      sw: "Inapakia kozi..."
+    },
+    featuredCourses: {
+      en: "Featured Courses",
+      sw: "Kozi Zilizochaguliwa"
+    },
+    courses: {
+      en: "Courses",
+      sw: "Kozi"
+    },
+    viewAllCourses: {
+      en: "View All Courses",
+      sw: "Angalia Kozi Zote"
+    },
+    bestSeller: {
+      en: "Best Seller",
+      sw: "Kiuzwaji Zaidi"
+    },
+    popular: {
+      en: "Popular",
+      sw: "Maarufu"
+    },
+    new: {
+      en: "New",
+      sw: "Mpya"
     }
   };
 
-  // Container animation
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1
-      }
-    }
-  };
+
 
   return (
-    <section className="bg-gradient-to-b from-white to-neutral-50 py-24 px-4 md:px-8 relative overflow-hidden">
-      {/* Decorative elements */}
-      <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-primary-50 to-transparent opacity-60" />
-      <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-primary-100 opacity-20" />
-      <div className="absolute -bottom-32 -left-20 w-96 h-96 rounded-full bg-primary-50 opacity-30" />
-      
-      <div className="max-w-screen-2xl mx-auto relative z-10">
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7 }}
-        >
-          <Heading
-            title={language === 'sw' ? "Bidhaa Zetu" : "Featured Products"}
-            subtitle={language === 'sw' ? "Pata Vyakula Bora" : "Discover Premium Quality"}
-            align="center"
-          />
-        </motion.div>
-        
+    <div className="bg-neutral-50 py-16 md:py-24">
+      <div className="container mx-auto px-4 md:px-8">
+        {/* Section header */}
+        <div className="max-w-lg mx-auto text-center mb-12 md:mb-16">
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-flex items-center gap-2 mb-3 px-4 py-1.5 rounded-full bg-primary-100 text-primary-700 font-medium text-sm">
+              <Sparkles size={16} />
+              <span>{translations.courses[language]}</span>
+            </div>
+            <h2 className="font-heading text-3xl md:text-4xl font-bold text-neutral-900 mb-4">
+              {translations.featuredCourses[language]}
+            </h2>
+            <div className="w-24 h-1 bg-primary-500 mx-auto"></div>
+          </motion.div>
+        </div>
+
         {loading ? (
           <div className="flex flex-col items-center justify-center py-16">
             <div className="w-12 h-12 rounded-full border-4 border-primary-100 border-t-primary-500 animate-spin mb-4" />
@@ -83,73 +107,71 @@ const ProductsSection = () => {
               {translations.loading[language]}
             </p>
           </div>
-        ) : products.length > 0 ? (
+        ) : (
           <>
-            {/* Desktop display - Grid */}
-            <motion.div 
-              className="hidden lg:grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mt-12"
-              variants={containerVariants}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
-            >
-              {products.map((product) => (
-                <ProductItem key={product.id} product={product} />
+            {/* Desktop view - 3 columns with enhanced styling */}
+            <div className="hidden lg:grid grid-cols-3 gap-8">
+              {featuredCourses.map((course) => (
+                <ProductItem key={course.id} product={course} />
               ))}
-            </motion.div>
+            </div>
             
-            {/* Mobile display - Swiper */}
-            <div className="lg:hidden mt-12">
+            {/* Mobile/Tablet view - Enhanced Swiper with 3D effect */}
+            <div className="lg:hidden">
               <Swiper
-                modules={[Pagination, Autoplay]}
+                modules={[Pagination, Autoplay, EffectCoverflow]}
+                effect="coverflow"
+                coverflowEffect={{
+                  rotate: 5,
+                  stretch: 0,
+                  depth: 100,
+                  modifier: 2.5,
+                  slideShadows: false,
+                }}
                 spaceBetween={16}
-                slidesPerView={1.2}
+                slidesPerView="auto"
                 centeredSlides={true}
                 loop={true}
                 autoplay={{
-                  delay: 3500,
+                  delay: 4000,
                   disableOnInteraction: false,
                 }}
                 pagination={{
                   clickable: true,
+                  dynamicBullets: true,
                 }}
-                breakpoints={{
-                  640: {
-                    slidesPerView: 2.2,
-                  }
-                }}
-                className="pb-12"
+                className="pb-16 pt-8"
+                style={{ padding: "30px 0" }}
               >
-                {products.map((product) => (
-                  <SwiperSlide key={product.id}>
-                    <ProductItem product={product} />
+                {featuredCourses.map((course) => (
+                  <SwiperSlide key={course.id} style={{ width: '85%', maxWidth: '340px' }}>
+                    <ProductItem product={course} />
                   </SwiperSlide>
                 ))}
               </Swiper>
             </div>
           </>
-        ) : (
-          <motion.div 
-            className="col-span-full text-center py-16"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="bg-white p-8 rounded-xl shadow-soft inline-block">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-neutral-100 flex items-center justify-center">
-                <svg className="w-8 h-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4M8 16l-4-4 4-4" />
-                </svg>
-              </div>
-              <p className="text-neutral-600 text-lg font-medium">
-                {translations.noProducts[language]}
-              </p>
-            </div>
-          </motion.div>
         )}
+        
+        {/* View all courses button with enhanced styling */}
+        <motion.div 
+          className="text-center mt-12"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          viewport={{ once: true }}
+        >
+          <Link
+            href="/courses"
+            className="inline-flex items-center gap-2 px-8 py-3 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all transform hover:-translate-y-1 hover:shadow-glow-lg"
+          >
+            <span>{translations.viewAllCourses[language]}</span>
+            <ArrowRight size={18} />
+          </Link>
+        </motion.div>
       </div>
-    </section>
+    </div>
   );
 };
 
-export default ProductsSection;
+export default CoursesSection;

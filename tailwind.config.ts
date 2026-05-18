@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -10,128 +9,138 @@ const config: Config = {
   theme: {
     extend: {
       boxShadow: {
-        layer: "0 35px 60px -15px rgba(0, 0, 0, 0.1)",
-        soft: "0 4px 24px rgba(0, 0, 0, 0.08)",
-        glow: "0 0 15px rgba(25, 195, 125, 0.4)", // Enhanced glow with vibrant green
-        'glow-lg': "0 0 25px rgba(25, 195, 125, 0.5)", // Larger glow effect
+        soft:      "0 1px 4px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04)",
+        card:      "0 2px 8px rgba(0,0,0,0.06), 0 12px 40px rgba(0,0,0,0.05)",
+        elevated:  "0 8px 32px rgba(0,0,0,0.10)",
+        "gold-ring":  "0 0 0 2px rgba(200,150,10,0.30)",
+        "green-ring": "0 0 0 2px rgba(45,122,45,0.25)",
       },
+
       colors: {
-        black: "#1a1a1a",
-        white: "#fefefe",
-        primary: {
-          50: "#e8faf2",
-          100: "#d1f5e5",
-          200: "#a3ebcb",
-          300: "#75e1b1",
-          400: "#47d797",
-          500: "#19C37D", // Vibrant shiny green as primary
-          600: "#14a367",
-          700: "#0f7a4d",
-          800: "#0a5233",
-          900: "#05291a",
-          950: "#02150d",
-        },
-        secondary: {
-          50: "#f0fdf7",
-          100: "#dcfce9",
-          200: "#bbf7d4",
-          300: "#86efba",
-          400: "#4ade95",
-          500: "#22C55E", // Bright complementary green
-          600: "#16a34a",
-          700: "#15803d",
-          800: "#166534",
-          900: "#14532d",
-          950: "#052e16",
-        },
-        neutral: {
-          50: "#f8faf8",
-          100: "#f0f5f2",
-          200: "#e0eae5",
-          300: "#cad9d1",
-          400: "#a8bcb2",
-          500: "#85998e",
-          600: "#677a71",
-          700: "#4d5b54",
-          800: "#333d38",
-          900: "#1a1e1c",
-        },
-        success: {
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          200: "#bbf7d0",
-          300: "#86efac",
-          400: "#4ade80",
-          500: "#22C55E", // Matching secondary for consistency
-          600: "#16a34a",
-          700: "#15803d",
-          800: "#166534",
-          900: "#14532d",
-        },
-        error: {
-          50: "#fef2f2",
-          100: "#fee2e2",
-          200: "#fecaca",
-          300: "#fca5a5",
-          400: "#f87171",
-          500: "#ef4444",
-          600: "#dc2626",
-          700: "#b91c1c",
-          800: "#991b1b",
-          900: "#7f1d1d",
-        },
-        accent: {
-          mint: "#D1F5E5",      // Brighter mint green
-          emerald: "#10B981",   // Vibrant emerald
-          forest: "#059669",    // Deep forest green
-          ivory: "#FFFFF0",     // Warm ivory
-          sage: "#86EFAC",      // Light sage green
+        brand: {
+          // ── Forest Green (primary) ───────────────────────────────
+          // Sampled from logo circle arc, bar chart icons, "Womanhood" serif text
+          "green-50":  "#f1f8f1",
+          "green-100": "#d6ecd6",
+          "green-200": "#aed5ae",
+          "green-300": "#7ab87a",
+          "green-400": "#4e9a4e",
+          "green-500": "#2d7a2d",   // ← hero brand green (sampled)
+          "green-600": "#246024",
+          "green-700": "#1b481b",
+          "green-800": "#123012",
+          "green-900": "#091809",
+
+          // ── Gold / Amber (co-primary) ────────────────────────────
+          // Sampled from the "W" letterform and "SAFARI" wordmark
+          "gold-50":  "#fdf8e7",
+          "gold-100": "#faeec4",
+          "gold-200": "#f4d97a",
+          "gold-300": "#e8be38",
+          "gold-400": "#d4a017",   // ← "SAFARI" text tone
+          "gold-500": "#c8960a",   // ← hero brand gold (sampled)
+          "gold-600": "#a07508",
+          "gold-700": "#785706",
+          "gold-800": "#503a04",
+          "gold-900": "#281d02",
+
+          // ── Black / White neutrals ───────────────────────────────
+          black:      "#0d0d0d",
+          "gray-900": "#161616",
+          "gray-800": "#222222",
+          "gray-700": "#383838",
+          "gray-600": "#545454",
+          "gray-500": "#737373",
+          "gray-400": "#9e9e9e",
+          "gray-300": "#c4c4c4",
+          "gray-200": "#e0e0e0",
+          "gray-100": "#f2f2f2",
+          "gray-50":  "#fafafa",
+          white:      "#ffffff",
         },
       },
+
       fontFamily: {
-        sans: ["var(--font-inter)", "sans-serif"],
-        heading: ["var(--font-playfair-display)", "serif"],
-        display: ["var(--font-libre-baskerville)", "serif"],
+        // Tall, heavy editorial display — brand name, hero headings
+        display: ["'Bebas Neue'",       "sans-serif"],
+        // Condensed grotesque — nav labels, body, UI
+        sans:    ["'Barlow Condensed'", "system-ui", "sans-serif"],
+        // Precision mono — badges, metadata, captions
+        mono:    ["'Roboto Mono'",      "monospace"],
       },
+
+      fontSize: {
+        "2xs": ["0.625rem", { lineHeight: "1rem",    letterSpacing: "0.12em"  }],
+        xs:    ["0.72rem",  { lineHeight: "1.1rem",  letterSpacing: "0.08em"  }],
+        sm:    ["0.85rem",  { lineHeight: "1.3rem",  letterSpacing: "0.04em"  }],
+        base:  ["1rem",     { lineHeight: "1.5rem",  letterSpacing: "0.01em"  }],
+        lg:    ["1.15rem",  { lineHeight: "1.55rem", letterSpacing: "0.01em"  }],
+        xl:    ["1.35rem",  { lineHeight: "1.4rem",  letterSpacing: "0em"     }],
+        "2xl": ["1.65rem",  { lineHeight: "1.25rem", letterSpacing: "-0.01em" }],
+        "3xl": ["2.1rem",   { lineHeight: "1.1rem",  letterSpacing: "-0.02em" }],
+        "4xl": ["2.7rem",   { lineHeight: "1rem",    letterSpacing: "-0.02em" }],
+        "5xl": ["3.5rem",   { lineHeight: "0.95rem", letterSpacing: "-0.02em" }],
+        "6xl": ["4.5rem",   { lineHeight: "0.92rem", letterSpacing: "-0.03em" }],
+        "7xl": ["5.75rem",  { lineHeight: "0.9rem",  letterSpacing: "-0.03em" }],
+        "8xl": ["7.5rem",   { lineHeight: "0.88rem", letterSpacing: "-0.04em" }],
+        "9xl": ["9.5rem",   { lineHeight: "0.86rem", letterSpacing: "-0.04em" }],
+      },
+
+      letterSpacing: {
+        tightest: "-0.05em",
+        tighter:  "-0.025em",
+        tight:    "-0.01em",
+        normal:   "0em",
+        wide:     "0.06em",
+        wider:    "0.12em",
+        widest:   "0.22em",
+        ultra:    "0.35em",
+      },
+
+      lineHeight: {
+        tightest: "0.86",
+        tighter:  "0.92",
+        tight:    "1.05",
+        snug:     "1.2",
+        normal:   "1.5",
+        relaxed:  "1.65",
+      },
+
+      borderRadius: {
+        none:    "0",
+        sm:      "2px",
+        DEFAULT: "4px",
+        md:      "6px",
+        lg:      "10px",
+        xl:      "16px",
+        full:    "9999px",
+      },
+
       keyframes: {
-        "pulse-glow": {
-          "0%, 100%": { 
-            boxShadow: "0 0 0 0 rgba(25, 195, 125, 0.7)",
-            opacity: "1"
-          },
-          "50%": { 
-            boxShadow: "0 0 20px 8px rgba(25, 195, 125, 0.5)",
-            opacity: "0.9"
-          },
+        "fade-up": {
+          "0%":   { opacity: "0", transform: "translateY(12px)" },
+          "100%": { opacity: "1", transform: "translateY(0)"    },
         },
         "fade-in": {
-          "0%": { opacity: "0" },
+          "0%":   { opacity: "0" },
           "100%": { opacity: "1" },
         },
-        "float": {
-          "0%, 100%": { transform: "translateY(0)" },
-          "50%": { transform: "translateY(-10px)" },
-        },
-        "shine": {
-          "0%": { backgroundPosition: "200% center" },
-          "100%": { backgroundPosition: "-200% center" },
+        "slide-down": {
+          "0%":   { opacity: "0", transform: "translateY(-8px)" },
+          "100%": { opacity: "1", transform: "translateY(0)"    },
         },
       },
       animation: {
-        "pulse-glow": "pulse-glow 2s infinite",
-        "fade-in": "fade-in 0.5s ease-out",
-        "float": "float 3s ease-in-out infinite",
-        "shine": "shine 4s linear infinite",
-      },
-      backgroundImage: {
-        'gradient-shiny': 'linear-gradient(90deg, rgba(25,195,125,1) 0%, rgba(34,197,94,1) 50%, rgba(25,195,125,1) 100%)',
+        "fade-up":    "fade-up 0.35s ease-out both",
+        "fade-in":    "fade-in 0.25s ease-out both",
+        "slide-down": "slide-down 0.22s ease-out both",
       },
     },
   },
   plugins: [
     require("@tailwindcss/typography"),
     require("@tailwindcss/forms"),
-    require("daisyui")
+    require("daisyui"),
   ],
 };
 

@@ -71,8 +71,15 @@ model product {
   rating         Int                      @default(0)
   description    String
   manufacturer   String
+  isPopular      Boolean                  @default(false)
+  oldPrice       Int                      @default(0)
+  isNew          Boolean                  @default(false)
+  isSale         Boolean                  @default(false)
+  isBestSeller   Boolean                  @default(false)
+  featured       Boolean                  @default(false)
   inStock        Int                      @default(1)
   categoryId     String
+  
   createdAt      DateTime                 @default(now())
   updatedAt      DateTime                 @updatedAt
   customerOrders customer_order_product[]
@@ -87,8 +94,8 @@ model user {
   email        String         @unique(map: "User_email_key")
   password     String?
   role         String?        @default("user")
-  createdAt    DateTime        @default(now())
-  updatedAt    DateTime        @updatedAt
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
   notification notification[]
   wishlist     wishlist[]
 }

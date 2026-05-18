@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
-import { FaFacebook, FaInstagram, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope } from "react-icons/fa";
+import { FaFacebook, FaInstagram, FaTwitter, FaMapMarkerAlt, FaPhone, FaEnvelope, FaLinkedin, FaYoutube } from "react-icons/fa";
 
 const Footer = () => {
   const { language } = useLanguage();
@@ -9,8 +9,8 @@ const Footer = () => {
   // Translation object
   const translations = {
     about: {
-      en: "Kechita Foods - Preserving Tanzania's culinary heritage through authentic flavors and modern presentation.",
-      sw: "Kechita Foods - Kwa mapishi bora Tanzania, Karibu Kechita Foods."
+      en: "Womanhood Safaris - Empowering women and young people through entrepreneurship education and practical business skills training.",
+      sw: "Womanhood Safaris - Kuwezesha wanawake na vijana kupitia elimu ya ujasiriamali na mafunzo ya ujuzi wa biashara."
     },
     quickLinks: {
       en: "Quick Links",
@@ -21,20 +21,36 @@ const Footer = () => {
       sw: "Wasiliana Nasi"
     },
     address: {
-      en: "Mikocheni B, Dar es Salaam, Tanzania",
-      sw: "Mikocheni B, Dar es Salaam, Tanzania"
+      en: "Dar es Salaam, Tanzania",
+      sw: "Dar es Salaam, Tanzania"
     },
     rights: {
       en: "All rights reserved",
       sw: "Haki zote zimehifadhiwa"
     },
-    menu: {
-      en: "Our Menu",
-      sw: "Menu Yetu"
+    programs: {
+      en: "Our Programs",
+      sw: "Programu Zetu"
     },
-    locations: {
-      en: "Locations",
-      sw: "Mikoa"
+    resources: {
+      en: "Resources",
+      sw: "Rasilimali"
+    },
+    workshops: {
+      en: "Workshops",
+      sw: "Warsha"
+    },
+    mentorship: {
+      en: "Mentorship",
+      sw: "Ushauri"
+    },
+    successStories: {
+      en: "Success Stories",
+      sw: "Hadithi za Mafanikio"
+    },
+    blog: {
+      en: "Blog",
+      sw: "Blogu"
     },
     privacy: {
       en: "Privacy Policy",
@@ -52,7 +68,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {/* About Section */}
           <div className="space-y-4">
-            <h3 className="font-display text-2xl text-primary-300">KECHITA FOODS</h3>
+            <h3 className="font-display text-2xl text-primary-300">WOMANHOOD SAFARIS</h3>
             <p className="text-neutral-300 text-sm leading-relaxed">
               {translations.about[language]}
             </p>
@@ -64,17 +80,17 @@ const Footer = () => {
               {translations.quickLinks[language]}
             </h4>
             <nav className="space-y-2">
-              <Link href="/shop" className="block text-neutral-300 hover:text-primary-400 transition-colors">
-                {translations.menu[language]}
+              <Link href="/programs" className="block text-neutral-300 hover:text-primary-400 transition-colors">
+                {translations.programs[language]}
               </Link>
-              <Link href="/locations" className="block text-neutral-300 hover:text-primary-400 transition-colors">
-                {translations.locations[language]}
+              <Link href="/workshops" className="block text-neutral-300 hover:text-primary-400 transition-colors">
+                {translations.workshops[language]}
               </Link>
-              <Link href="/privacy" className="block text-neutral-300 hover:text-primary-400 transition-colors">
-                {translations.privacy[language]}
+              <Link href="/mentorship" className="block text-neutral-300 hover:text-primary-400 transition-colors">
+                {translations.mentorship[language]}
               </Link>
-              <Link href="/terms" className="block text-neutral-300 hover:text-primary-400 transition-colors">
-                {translations.terms[language]}
+              <Link href="/success-stories" className="block text-neutral-300 hover:text-primary-400 transition-colors">
+                {translations.successStories[language]}
               </Link>
             </nav>
           </div>
@@ -97,8 +113,8 @@ const Footer = () => {
               </div>
               <div className="flex items-center gap-3 text-neutral-300">
                 <FaEnvelope className="flex-shrink-0" />
-                <a href="mailto:info@kechitafoods.com" className="hover:text-primary-400 transition-colors">
-                  info@kechitafoods.com
+                <a href="mailto:info@womanhoodsafaris.com" className="hover:text-primary-400 transition-colors">
+                  info@womanhoodsafaris.com
                 </a>
               </div>
             </div>
@@ -109,16 +125,40 @@ const Footer = () => {
             <h4 className="font-sans font-semibold text-lg text-primary-300">
               {language === 'en' ? 'Follow Us' : 'Tufuate'}
             </h4>
-            <div className="flex gap-4">
-              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors">
+            <div className="flex flex-wrap gap-4">
+              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors" aria-label="Facebook">
                 <FaFacebook size={24} />
               </a>
-              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors">
+              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors" aria-label="Instagram">
                 <FaInstagram size={24} />
               </a>
-              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors">
+              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors" aria-label="Twitter">
                 <FaTwitter size={24} />
               </a>
+              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors" aria-label="LinkedIn">
+                <FaLinkedin size={24} />
+              </a>
+              <a href="#" className="text-neutral-300 hover:text-primary-400 transition-colors" aria-label="YouTube">
+                <FaYoutube size={24} />
+              </a>
+            </div>
+            
+            {/* Resources Section */}
+            <div className="mt-6">
+              <h4 className="font-sans font-semibold text-lg text-primary-300 mb-2">
+                {translations.resources[language]}
+              </h4>
+              <div className="space-y-2">
+                <Link href="/blog" className="block text-neutral-300 hover:text-primary-400 transition-colors">
+                  {translations.blog[language]}
+                </Link>
+                <Link href="/privacy" className="block text-neutral-300 hover:text-primary-400 transition-colors">
+                  {translations.privacy[language]}
+                </Link>
+                <Link href="/terms" className="block text-neutral-300 hover:text-primary-400 transition-colors">
+                  {translations.terms[language]}
+                </Link>
+              </div>
             </div>
           </div>
         </div>
@@ -126,7 +166,7 @@ const Footer = () => {
         {/* Copyright */}
         <div className="border-t border-neutral-700 mt-8 pt-6 text-center">
           <p className="text-neutral-400 text-sm">
-            © {new Date().getFullYear()} Kechita Foods. {translations.rights[language]}
+            © {new Date().getFullYear()} Womanhood Safaris. {translations.rights[language]}
           </p>
         </div>
       </div>

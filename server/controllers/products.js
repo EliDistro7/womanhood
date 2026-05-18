@@ -1,5 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const { v4: uuidv4 } = require("uuid");
 
 async function getAllProducts(request, response) {
   const mode = request.query.mode || "";
@@ -260,6 +261,7 @@ async function createProduct(request, response) {
     } = request.body;
     const product = await prisma.product.create({
       data: {
+        id: uuidv4(),
         slug,
         title,
         mainImage,
@@ -267,7 +269,7 @@ async function createProduct(request, response) {
         rating: 5,
         description,
         manufacturer,
-        categoryId,
+        categoryId: categoryId === null ? null : categoryId,
         inStock,
       },
     });

@@ -27,8 +27,8 @@ const BuyNowSingleProductBtn = ({
   // Translations
   const translations = {
     buyNow: {
-      en: "Buy Now",
-      sw: "Nunua Sasa"
+      en: "Pay Now",
+      sw: "Lipia Sasa"
     },
     productAdded: {
       en: "Product added to the cart",
