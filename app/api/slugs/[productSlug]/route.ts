@@ -7,7 +7,7 @@ export async function GET(
     { params }: { params: { productSlug: string } }
   ) {
     const { productSlug } = params;
-    const products = await prisma.product.findMany();
+    const products = await prisma.product.findMany()
     // Simulate fetching from DB
     const product = products.find((item) => item.slug === productSlug);
   
