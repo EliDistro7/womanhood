@@ -152,16 +152,16 @@ const CoursesSection = () => {
                     <span className={`absolute top-3 left-3 z-10 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase px-2.5 py-1 rounded-[2px] ${BADGE_VARIANTS[0].style}`}>
                       {BADGE_VARIANTS[0].label[language]}
                     </span>
-                    <ProductItem product={featuredCourses[0]} variant="image-only" />
+                    <ProductItem product={featuredCourses[0]}  />
                   </div>
 
                   {/* Body */}
                   <div className="flex flex-col flex-1 p-6">
-                    <ProductItem product={featuredCourses[0]} variant="body-dark" />
+                    <ProductItem product={featuredCourses[0]} />
 
                     {/* CTA */}
                     <div className="mt-auto pt-5 border-t border-brand-gray-800 flex items-center justify-between">
-                      <ProductItem product={featuredCourses[0]} variant="price-dark" />
+                      <ProductItem product={featuredCourses[0]}  />
                       <Link
                         href={`/courses/${featuredCourses[0].id}`}
                         className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-[2px] bg-brand-gold-500 text-brand-gold-900 hover:bg-brand-gold-400 transition-colors duration-200 group/btn"
@@ -191,15 +191,15 @@ const CoursesSection = () => {
                     <span className={`absolute top-3 left-3 z-10 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase px-2.5 py-1 rounded-[2px] ${BADGE_VARIANTS[idx + 1].style}`}>
                       {BADGE_VARIANTS[idx + 1].label[language]}
                     </span>
-                    <ProductItem product={course} variant="image-only" />
+                    <ProductItem product={course}  />
                   </div>
 
                   {/* Body */}
                   <div className="flex flex-col flex-1 p-5">
-                    <ProductItem product={course} variant="body-light" />
+                    <ProductItem product={course} />
 
                     <div className="mt-auto pt-4 border-t border-brand-gray-200 flex items-center justify-between">
-                      <ProductItem product={course} variant="price-light" />
+                      <ProductItem product={course}  />
                       <Link
                         href={`/courses/${course.id}`}
                         className="inline-flex items-center gap-1.5 font-mono text-[11px] font-semibold tracking-[0.14em] uppercase px-4 py-2 rounded-[2px] bg-brand-green-500 text-brand-white hover:bg-brand-green-600 transition-colors duration-200 group/btn"
@@ -237,12 +237,12 @@ const CoursesSection = () => {
                         <span className={`absolute top-3 left-3 z-10 font-mono text-[10px] font-semibold tracking-[0.14em] uppercase px-2.5 py-1 rounded-[2px] ${BADGE_VARIANTS[idx]?.style ?? BADGE_VARIANTS[0].style}`}>
                           {(BADGE_VARIANTS[idx] ?? BADGE_VARIANTS[0]).label[language]}
                         </span>
-                        <ProductItem product={course} variant="image-only" />
+                        <ProductItem product={course} />
                       </div>
                       <div className="p-5 flex flex-col flex-1">
-                        <ProductItem product={course} variant={idx === 0 ? "body-dark" : "body-light"} />
+                        <ProductItem product={course} />
                         <div className={`mt-4 pt-4 border-t flex items-center justify-between ${idx === 0 ? "border-brand-gray-800" : "border-brand-gray-200"}`}>
-                          <ProductItem product={course} variant={idx === 0 ? "price-dark" : "price-light"} />
+                          <ProductItem product={course} />
                           <Link
                             href={`/courses/${course.id}`}
                             className={`inline-flex items-center gap-1 font-mono text-[11px] font-semibold tracking-[0.14em] uppercase px-3 py-1.5 rounded-[2px] transition-colors duration-200 ${idx === 0 ? "bg-brand-gold-500 text-brand-gold-900 hover:bg-brand-gold-400" : "bg-brand-green-500 text-brand-white hover:bg-brand-green-600"}`}
