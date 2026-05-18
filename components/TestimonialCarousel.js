@@ -6,17 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { FaQuoteLeft, FaChevronLeft, FaChevronRight } from 'react-icons/fa';
 import { useLanguage } from '@/context/LanguageContext';
 
-interface Testimonial {
-  id: number;
-  name: string;
-  role: string;
-  quote: {
-    en: string;
-    sw: string;
-  };
-  image: string;
-  business?: string;
-}
+
 
 const TestimonialsCarousel = () => {
   const { language } = useLanguage();
@@ -45,7 +35,7 @@ const TestimonialsCarousel = () => {
     }
   };
 
-  const testimonials: Testimonial[] = [
+  const testimonials = [
     {
       id: 1,
       name: "Sarah Kimathi",
