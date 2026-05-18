@@ -18,7 +18,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (products.length === 0) {
-      toast.error("You don't have items in your cart");
+      toast.error("You dont have items in your cart");
       router.push("/cart");
     }
   }, [products, router]);

@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 // WishlistItem component
 const WishlistItem = ({ item, onRemove }) => {
     return (

@@ -1,3 +1,6 @@
+
+import { Bell, Award } from 'lucide-react';
+
 // Notification Card component
 const NotificationCard = ({ notification }) => {
     const typeStyles = {
