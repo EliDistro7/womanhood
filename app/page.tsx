@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <>
  <WHero />
-    <ImpactStats />
+   {/* <ImpactStats /> */}
   
     <ProductsSection />
     <CallToAction />
